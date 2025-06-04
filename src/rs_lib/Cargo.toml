@@ -1,0 +1,31 @@
+[package]
+name = "rs_lib"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+path = "lib.rs"
+
+[dependencies]
+anyhow = "1.0.98"
+console_error_panic_hook = "0.1.6"
+js-sys = "=0.3.77"
+serde = "1"
+serde-wasm-bindgen = "=0.6.5"
+wasm-bindgen = "=0.2.100"
+wasm-bindgen-futures = "=0.4.50"
+async-trait = "0.1.88"
+deno_cache_dir = { version = "0.22.1", features = ["sync"] }
+deno_config = { version = "0.54.2", features = ["workspace", "sync"] }
+deno_error = "0.6.0"
+deno_graph = { version = "0.95.0", default-features = false }
+deno_npm_cache = { path = "../../../deno/resolvers/npm_cache" }
+deno_npm_installer = { path = "../../../deno/resolvers/npm_installer", default-features = false }
+deno_path_util = "0.3.3"
+deno_resolver = { path = "../../../deno/resolvers/deno", features = ["graph", "sync"] }
+deno_semver = "0.8.0"
+node_resolver = { path = "../../../deno/resolvers/node", features = ["sync"] }
+oxc = { version = "0.72.1", features = ["ast_visit", "transformer", "minifier", "mangler", "semantic", "codegen", "serialize", "isolated_declarations", "regular_expression", "cfg"] }
+sys_traits = { version = "0.1.12", features = ["real", "wasm"] }
+url = "2.5.4"

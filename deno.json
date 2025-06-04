@@ -1,0 +1,15 @@
+{
+  "name": "@deno/rolldown-plugin",
+  "tasks": {
+    "wasmbuild": "deno run -A jsr:@deno/wasmbuild@0.19.2 --out ./src/lib"
+  },
+  "publish": {
+    "exclude": [
+      "!./src/lib"
+    ]
+  },
+  "exports": "./src/mod.ts",
+  "exclude": [
+    "./target"
+  ]
+}
