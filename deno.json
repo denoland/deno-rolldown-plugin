@@ -1,5 +1,6 @@
 {
   "name": "@deno/rolldown-plugin",
+  "version": "0.0.2",
   "tasks": {
     "wasmbuild": "deno run -A jsr:@deno/wasmbuild@0.19.2 --out ./src/lib"
   },

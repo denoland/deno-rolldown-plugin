@@ -37,7 +37,7 @@ interface Module {
   code: string;
 }
 
-export default function denoPlugin({ debug = false }: { debug?: boolean }) {
+export default function denoPlugin({ debug = false }: { debug?: boolean } = {}): any {
   let plugin: DenoPlugin;
   const loads = new Map<string, Promise<LoadResponse | undefined>>();
   const modules = new Map<string, Module | undefined>();
