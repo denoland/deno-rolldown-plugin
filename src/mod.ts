@@ -1,4 +1,11 @@
-import { DenoWorkspace, type DenoLoader, MediaType, type LoadResponse, ResolutionMode, type DenoWorkspaceOptions } from "@deno/loader";
+import {
+  type DenoLoader,
+  DenoWorkspace,
+  type DenoWorkspaceOptions,
+  type LoadResponse,
+  MediaType,
+  ResolutionMode,
+} from "@deno/loader";
 
 interface Module {
   specifier: string;
@@ -9,18 +16,40 @@ interface Module {
 export interface DenoPluginOptions extends DenoWorkspaceOptions {
 }
 
+export interface BuildStartOptions {
+  input: string | string[] | Record<string, string>;
+}
+
+export interface ResolveIdOptions {
+  kind: "import-statement" | "dynamic-import"| "require-call";
+}
+
+export interface DenoPlugin extends Disposable {
+  name: string;
+  buildStart(options: BuildStartOptions): Promise<void>;
+  resolveId(
+    source: string,
+    importer: string | undefined,
+    options: ResolveIdOptions,
+  ): Promise<string>;
+  load(id: string): string | undefined;
+}
+
 /**
  * Creates a deno plugin for use with rolldown or rollup.
  * @returns The plugin.
  */
-export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): any {
+export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): DenoPlugin {
   let loader: DenoLoader;
   const loads = new Map<string, Promise<LoadResponse | undefined>>();
   const modules = new Map<string, Module | undefined>();
 
   return {
     name: "deno-plugin",
-    async buildStart(options: any) {
+    [Symbol.dispose]() {
+      loader?.[Symbol.dispose]();
+    },
+    async buildStart(options: BuildStartOptions) {
       const inputs = Array.isArray(options.input)
         ? options.input
         : typeof options.input === "object"
@@ -28,7 +57,7 @@ export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): any {
         : [options.input];
 
       const workspace = new DenoWorkspace({
-        ...pluginOptions
+        ...pluginOptions,
       });
       loader = await workspace.createLoader({
         entrypoints: inputs,
@@ -37,13 +66,17 @@ export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): any {
     async resolveId(
       source: string,
       importer: string | undefined,
-      options: any,
+      options: ResolveIdOptions,
     ) {
       const resolutionMode = resolveKindToResolutionMode(options.kind);
       importer = importer == null
         ? undefined
         : (modules.get(importer)?.specifier ?? importer);
-      const resolvedSpecifier = loader.resolve(source, importer, resolutionMode);
+      const resolvedSpecifier = loader.resolve(
+        source,
+        importer,
+        resolutionMode,
+      );
 
       // now load
       let loadPromise = loads.get(resolvedSpecifier);
@@ -59,7 +92,7 @@ export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): any {
       let specifier = result.specifier;
       if (!specifier.endsWith(ext)) {
         specifier += +".rolldown" + ext;
-        if (debug) {
+        if (pluginOptions.debug) {
           console.error("Remapped", result.specifier, "to", specifier);
         }
       }
@@ -69,7 +102,7 @@ export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): any {
       });
       return specifier;
     },
-    load(id: any) {
+    load(id: string) {
       return modules.get(id)?.code;
     },
   };

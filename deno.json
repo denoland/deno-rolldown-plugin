@@ -2,10 +2,16 @@
   "name": "@deno/rolldown-plugin",
   "version": "0.0.3",
   "exports": "./src/mod.ts",
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
+  },
   "exclude": [
     "./target"
   ],
   "imports": {
-    "@deno/loader": "jsr:@deno/loader@0.0.5"
+    "@deno/loader": "jsr:@deno/loader@0.0.5",
+    "@std/assert": "jsr:@std/assert@^1.0.13"
   }
 }
