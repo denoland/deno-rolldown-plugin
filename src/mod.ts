@@ -21,7 +21,7 @@ export interface BuildStartOptions {
 }
 
 export interface ResolveIdOptions {
-  kind: "import-statement" | "dynamic-import"| "require-call";
+  kind: "import-statement" | "dynamic-import" | "require-call";
 }
 
 export interface DenoPlugin extends Disposable {
@@ -39,7 +39,9 @@ export interface DenoPlugin extends Disposable {
  * Creates a deno plugin for use with rolldown or rollup.
  * @returns The plugin.
  */
-export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): DenoPlugin {
+export default function denoPlugin(
+  pluginOptions: DenoPluginOptions = {},
+): DenoPlugin {
   let loader: DenoLoader;
   const loads = new Map<string, Promise<LoadResponse | undefined>>();
   const modules = new Map<string, Module | undefined>();
