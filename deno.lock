@@ -1,0 +1,16 @@
+{
+  "version": "5",
+  "specifiers": {
+    "jsr:@deno/loader@0.0.5": "0.0.5"
+  },
+  "jsr": {
+    "@deno/loader@0.0.5": {
+      "integrity": "cef2318f72e6da9ffbd14e20822c276298e3431c0e0eb8513c0cd20f5e680730"
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@deno/loader@0.0.5"
+    ]
+  }
+}

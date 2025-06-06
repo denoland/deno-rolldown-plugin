@@ -1,44 +1,20 @@
-import { DenoPlugin } from "./lib/rs_lib.js";
-
-enum MediaType {
-  JavaScript = 0,
-  Jsx = 1,
-  Mjs = 2,
-  Cjs = 3,
-  TypeScript = 4,
-  Mts = 5,
-  Cts = 6,
-  Dts = 7,
-  Dmts = 8,
-  Dcts = 9,
-  Tsx = 10,
-  Css = 11,
-  Json = 12,
-  Html = 13,
-  Sql = 14,
-  Wasm = 15,
-  SourceMap = 16,
-  Unknown = 17,
-}
-
-enum ResolutionMode {
-  Require = 0,
-  Import = 1,
-}
-
-interface LoadResponse {
-  specifier: string;
-  mediaType: MediaType;
-  code: string;
-}
+import { DenoWorkspace, type DenoLoader, MediaType, type LoadResponse, ResolutionMode, type DenoWorkspaceOptions } from "@deno/loader";
 
 interface Module {
   specifier: string;
   code: string;
 }
 
-export default function denoPlugin({ debug = false }: { debug?: boolean } = {}): any {
-  let plugin: DenoPlugin;
+/** Options for creating the Deno plugin. */
+export interface DenoPluginOptions extends DenoWorkspaceOptions {
+}
+
+/**
+ * Creates a deno plugin for use with rolldown or rollup.
+ * @returns The plugin.
+ */
+export default function denoPlugin(pluginOptions: DenoPluginOptions = {}): any {
+  let loader: DenoLoader;
   const loads = new Map<string, Promise<LoadResponse | undefined>>();
   const modules = new Map<string, Module | undefined>();
 
@@ -51,14 +27,12 @@ export default function denoPlugin({ debug = false }: { debug?: boolean } = {}):
         ? Object.values(options.input)
         : [options.input];
 
-      if (debug) {
-        console.error("Inputs:", inputs);
-      }
-      try {
-        plugin = await DenoPlugin.create(inputs);
-      } catch (err: any) {
-        throw new Error(err);
-      }
+      const workspace = new DenoWorkspace({
+        ...pluginOptions
+      });
+      loader = await workspace.createLoader({
+        entrypoints: inputs,
+      });
     },
     async resolveId(
       source: string,
@@ -66,33 +40,17 @@ export default function denoPlugin({ debug = false }: { debug?: boolean } = {}):
       options: any,
     ) {
       const resolutionMode = resolveKindToResolutionMode(options.kind);
-      let resolvedSpecifier: string;
       importer = importer == null
         ? undefined
         : (modules.get(importer)?.specifier ?? importer);
-      if (debug) {
-        console.error("Resolving", source, "from", importer);
-      }
-      try {
-        resolvedSpecifier = plugin.resolve(source, importer, resolutionMode);
-      } catch (err: any) {
-        throw new Error(err);
-      }
-      if (debug) {
-        console.error("Resolved", source, "to", resolvedSpecifier);
-      }
+      const resolvedSpecifier = loader.resolve(source, importer, resolutionMode);
 
       // now load
       let loadPromise = loads.get(resolvedSpecifier);
       if (loadPromise == null) {
-        loadPromise = plugin.load(resolvedSpecifier);
+        loadPromise = loader.load(resolvedSpecifier);
       }
-      let result: LoadResponse | undefined;
-      try {
-        result = await loadPromise;
-      } catch (err: any) {
-        throw new Error(err);
-      }
+      const result = await loadPromise;
       if (result == null) {
         modules.set(resolvedSpecifier, undefined);
         return resolvedSpecifier;
@@ -107,7 +65,7 @@ export default function denoPlugin({ debug = false }: { debug?: boolean } = {}):
       }
       modules.set(specifier, {
         specifier: result.specifier,
-        code: result.code,
+        code: new TextDecoder().decode(result.code),
       });
       return specifier;
     },
@@ -160,7 +118,10 @@ function mediaTypeToExtension(mediaType: MediaType) {
 function resolveKindToResolutionMode(kind: string): ResolutionMode {
   switch (kind) {
     case "import-statement":
+    case "dynamic-import":
       return ResolutionMode.Import;
+    case "require-call":
+      return ResolutionMode.Require;
     default:
       throw new Error("not implemented: " + kind);
   }
