@@ -1,6 +1,5 @@
 {
   "name": "@deno/rolldown-plugin",
-  "version": "0.0.3",
   "exports": "./src/mod.ts",
   "lint": {
     "rules": {
