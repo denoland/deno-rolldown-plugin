@@ -10,7 +10,7 @@
     "./target"
   ],
   "imports": {
-    "@deno/loader": "jsr:@deno/loader@0.0.5",
+    "@deno/loader": "jsr:@deno/loader@0.0.6",
     "@std/assert": "jsr:@std/assert@^1.0.13"
   }
 }
