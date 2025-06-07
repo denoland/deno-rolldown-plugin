@@ -31,7 +31,7 @@ export interface DenoPlugin extends Disposable {
     source: string,
     importer: string | undefined,
     options: ResolveIdOptions,
-  ): Promise<string>;
+  ): Promise<string | { id: string; external: boolean }>;
   load(id: string): string | undefined;
 }
 
@@ -89,6 +89,12 @@ export default function denoPlugin(
       if (result == null) {
         modules.set(resolvedSpecifier, undefined);
         return resolvedSpecifier;
+      }
+      if (result.kind === "external") {
+        return {
+          id: result.specifier,
+          external: true,
+        };
       }
       const ext = mediaTypeToExtension(result.mediaType);
       let specifier = result.specifier;
