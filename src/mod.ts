@@ -99,7 +99,7 @@ export default function denoPlugin(
       const ext = mediaTypeToExtension(result.mediaType);
       let specifier = result.specifier;
       if (!specifier.endsWith(ext)) {
-        specifier += +".rolldown" + ext;
+        specifier += ".rolldown" + ext;
         if (pluginOptions.debug) {
           console.error("Remapped", result.specifier, "to", specifier);
         }
@@ -119,8 +119,9 @@ export default function denoPlugin(
 function mediaTypeToExtension(mediaType: MediaType) {
   switch (mediaType) {
     case MediaType.JavaScript:
-    case MediaType.Mjs:
       return ".js";
+    case MediaType.Mjs:
+      return ".mjs";
     case MediaType.Cjs:
       return ".cjs";
     case MediaType.Jsx:
