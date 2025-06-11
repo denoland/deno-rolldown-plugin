@@ -3,7 +3,7 @@ import { assertEquals } from "@std/assert";
 
 Deno.test("should load and resolve", async () => {
   const plugin = denoPlugin({
-    noTranspile: true
+    noTranspile: true,
   });
   await plugin.buildStart({
     input: import.meta.url,

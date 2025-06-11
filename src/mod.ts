@@ -1,10 +1,10 @@
 import {
   type Loader,
-  Workspace,
-  type WorkspaceOptions,
   type LoadResponse,
   MediaType,
   ResolutionMode,
+  Workspace,
+  type WorkspaceOptions,
 } from "@deno/loader";
 
 interface Module {
