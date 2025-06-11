@@ -1,10 +1,10 @@
 import {
-  type DenoLoader,
-  DenoWorkspace,
-  type DenoWorkspaceOptions,
+  type Loader,
   type LoadResponse,
   MediaType,
   ResolutionMode,
+  Workspace,
+  type WorkspaceOptions,
 } from "@deno/loader";
 
 interface Module {
@@ -13,7 +13,11 @@ interface Module {
 }
 
 /** Options for creating the Deno plugin. */
-export interface DenoPluginOptions extends DenoWorkspaceOptions {
+export interface DenoPluginOptions extends WorkspaceOptions {
+  /** Whether to preserve JSX syntax in the loaded output. */
+  preserveJsx?: boolean;
+  /** Skip transpiling TypeScript and JSX. */
+  noTranspile?: boolean;
 }
 
 export interface BuildStartOptions {
@@ -42,7 +46,7 @@ export interface DenoPlugin extends Disposable {
 export default function denoPlugin(
   pluginOptions: DenoPluginOptions = {},
 ): DenoPlugin {
-  let loader: DenoLoader;
+  let loader: Loader;
   const loads = new Map<string, Promise<LoadResponse | undefined>>();
   const modules = new Map<string, Module | undefined>();
 
@@ -58,11 +62,13 @@ export default function denoPlugin(
         ? Object.values(options.input)
         : [options.input];
 
-      const workspace = new DenoWorkspace({
+      const workspace = new Workspace({
         ...pluginOptions,
       });
       loader = await workspace.createLoader({
         entrypoints: inputs,
+        noTranspile: pluginOptions.noTranspile,
+        preserveJsx: pluginOptions.preserveJsx,
       });
     },
     async resolveId(
