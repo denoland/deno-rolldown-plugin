@@ -84,7 +84,10 @@ export default function denoPlugin(
       // now load
       let loadPromise = loads.get(resolvedSpecifier);
       if (loadPromise == null) {
-        loadPromise = loader.load(resolvedSpecifier, RequestedModuleType.Default);
+        loadPromise = loader.load(
+          resolvedSpecifier,
+          RequestedModuleType.Default,
+        );
       }
       const result = await loadPromise;
       if (result == null) {
