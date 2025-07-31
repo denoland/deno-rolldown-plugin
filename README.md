@@ -31,7 +31,7 @@ be resolved).
    import { defineConfig } from "rolldown";
 
    export default defineConfig({
-     input: "main.js",
+     input: "./main.js",
      output: {
        file: "bundle.js",
      },
