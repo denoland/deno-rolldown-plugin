@@ -1,5 +1,6 @@
 import denoPlugin from "./mod.ts";
 import { assertEquals } from "@std/assert";
+import { fromFileUrl } from "@std/path";
 
 Deno.test("should load and resolve", async () => {
   const plugin = denoPlugin({
@@ -12,9 +13,9 @@ Deno.test("should load and resolve", async () => {
     const value = (await plugin.resolveId("./mod.ts", import.meta.url, {
       kind: "import-statement",
     })) as string;
-    assertEquals(value, import.meta.resolve("./mod.ts"));
+    assertEquals(value, fromFileUrl(import.meta.resolve("./mod.ts")));
     const text = await plugin.load(value);
-    assertEquals(text, Deno.readTextFileSync(new URL(value)));
+    assertEquals(text, Deno.readTextFileSync(value));
   }
   // node specifier
   {

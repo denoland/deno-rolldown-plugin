@@ -7,6 +7,7 @@ import {
   Workspace,
   type WorkspaceOptions,
 } from "@deno/loader";
+import { fromFileUrl } from "@std/path/from-file-url";
 
 interface Module {
   specifier: string;
@@ -103,9 +104,13 @@ export default function denoPlugin(
       let specifier = result.specifier;
       if (!specifier.endsWith(ext)) {
         specifier += ".rolldown" + ext;
-        if (pluginOptions.debug) {
-          console.error("Remapped", result.specifier, "to", specifier);
-        }
+      }
+      if (specifier.startsWith("file:///")) {
+        // use a path for files so the base gets stripped
+        specifier = fromFileUrl(specifier);
+      }
+      if (pluginOptions.debug && result.specifier !== specifier) {
+        console.error("Remapped", result.specifier, "to", specifier);
       }
       modules.set(specifier, {
         specifier: result.specifier,
