@@ -62,9 +62,8 @@ export default function denoPlugin(
       const workspace = new Workspace({
         ...pluginOptions,
       });
-      loader = await workspace.createLoader({
-        entrypoints: inputs,
-      });
+      loader = await workspace.createLoader();
+      await loader.addEntrypoints(inputs);
     },
     async resolveId(
       source: string,
@@ -75,7 +74,7 @@ export default function denoPlugin(
       importer = importer == null
         ? undefined
         : (modules.get(importer)?.specifier ?? importer);
-      const resolvedSpecifier = loader.resolve(
+      const resolvedSpecifier = await loader.resolve(
         source,
         importer,
         resolutionMode,

@@ -1,13 +1,13 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@deno/loader@~0.2.1": "0.2.1",
+    "jsr:@deno/loader@0.3": "0.3.0",
     "jsr:@std/assert@^1.0.13": "1.0.13",
     "jsr:@std/internal@^1.0.6": "1.0.8"
   },
   "jsr": {
-    "@deno/loader@0.2.1": {
-      "integrity": "c9fcc7309ce6a77306d37a7dc4b886e547aafc5204a4a28b0eafa523ffa5c9fc"
+    "@deno/loader@0.3.0": {
+      "integrity": "f6a293012922c3c560ae0fb24db2065566f8307f48fceac2d4ddfcce5fd3a9d7"
     },
     "@std/assert@1.0.13": {
       "integrity": "ae0d31e41919b12c656c742b22522c32fb26ed0cba32975cb0de2a273cb68b29",
@@ -21,7 +21,7 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@deno/loader@~0.2.1",
+      "jsr:@deno/loader@0.3",
       "jsr:@std/assert@^1.0.13"
     ]
   }
